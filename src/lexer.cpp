@@ -46,7 +46,7 @@ std::vector<char> Lexer::getQueries()
     return _queries;
 }
 
-std::string Lexer::_deleteComments (std::string line)
+std::string Lexer::deleteComments (std::string line)
 {
     size_t pos = line.find_first_of ("#");
     if (pos != std::string::npos) {
@@ -54,7 +54,7 @@ std::string Lexer::_deleteComments (std::string line)
     }
     return line;
 }
-void Lexer::_addFacts (std::string const & line)
+void Lexer::addFacts (std::string const & line)
 {
     // LATER: check validity
     for (char const & elem: line) {
@@ -68,7 +68,7 @@ void Lexer::_addFacts (std::string const & line)
     // }
 }
 
-void Lexer::_addQueries (std::string const & line)
+void Lexer::addQueries (std::string const & line)
 {
     // LATER: check validity
     for (char const & elem: line) {
