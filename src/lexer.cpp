@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include <boost/algorithm/string.hpp>
 #include "../include/lexer.hpp"
 
 Lexer::Lexer (std::string const & file_name)
@@ -10,17 +11,17 @@ Lexer::Lexer (std::string const & file_name)
     if (myfile.is_open())
         {
             while (std::getline (myfile,line)) {
-                line = _deleteComments(line);
+                line = deleteComments(line);
                 if(!line.empty()) {
                     // std::cout << line << std::endl;
                     if (line[0] == '=') {
-                        _addFacts(line);
+                        addFacts(line);
                     }
                     else if (line[0] == '?') {
-                        _addQueries(line);
+                        addQueries(line);
                     }
                     else {
-                        //TODO rules
+                        addRules(line);
                     }
                 }
             }
@@ -31,7 +32,7 @@ Lexer::Lexer (std::string const & file_name)
     }
 }
 
-std::vector<std::string> Lexer::getRules()
+std::vector<Rule> Lexer::getRules()
 {
     return _rules;
 }
@@ -80,4 +81,45 @@ void Lexer::addQueries (std::string const & line)
     // for(auto& elem : _queries) {
     //     std::cout << elem << std::endl;
     // }
+}
+
+void Lexer::addRules (std::string const & line)
+{
+    std::vector<std::string> tokens;
+    boost::split(tokens, line, [](char c){return c == ' ';});
+
+    Rule newRule;
+    Fact::Type currentType = Fact::Type::AND;
+    std::vector<Fact>* currentVector = &newRule._conditions;
+    for (std::string& elem : tokens) {
+        Fact newFact;
+        newFact._type = currentType;
+        currentType = Fact::Type::AND;
+        if ('A' <= elem[0] && elem[0] <= 'Z') {
+            newFact._val = elem[0];
+            currentVector->push_back(newFact);
+        }
+        else if (elem[0] == '!') {
+            newFact._val = elem[1];
+            newFact._type = Fact::Type::ANDNOT;
+            currentVector->push_back(newFact);
+        }
+        else if (elem[0] == '|') {
+            currentType = Fact::Type::OR;
+            currentVector->back()._type = currentType;
+        }
+        else if (elem[0] == '^') {
+            currentType = Fact::Type::XOR;
+            currentVector->back()._type = currentType;
+        }
+        else if (elem[0] == '=') {
+            currentVector = &newRule._result;
+        }
+        //TODO XORNOT ORNOT IFANDONLYIF
+
+    }
+    // std::cout << newRule._conditions.size() << std::endl;
+    // std::cout << newRule._result.size() << std::endl;
+    // std::cout << std::endl;
+    _rules.push_back(newRule);
 }
