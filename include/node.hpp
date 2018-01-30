@@ -9,6 +9,6 @@ struct Fact
         // ORNOT,
         // XORNOT,
     };
-    char _val;
+    char _data;
     Type _type;
 };

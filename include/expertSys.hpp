@@ -13,7 +13,7 @@ public:
 
 private:
     
-    bool              applyRules();
+    void              applyRules();
 
     std::map<char, bool> _factsStatus;
     Lexer             _lexer;

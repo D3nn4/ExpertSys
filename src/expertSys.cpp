@@ -16,25 +16,29 @@ ExpertSys::ExpertSys(std::string const & file_name)
     for (char& trueFact : _facts) {
         _factsStatus[trueFact] = true;
     }
-    // applyRules();
+    applyRules();
 }
 
-// bool ExpertSys::applyRules()
-// {
-//     size_t i = 0;
-//     while (i < _rules.size()) {
-//         if (!_rules[i]._isApplied) {
-//             bool ruleApplied = _rules[i].applyRule(_factsStatus);
-//         }
-//         if(!ruleApplied) {
-//             i++;
-//         }
-//         else {
-//             i = 0;
-//         }
-//     }
+void ExpertSys::applyRules()
+{
+    size_t i = 0;
+    while (i < _rules.size()) {
+        std::cout << "rule nb " << i << std::endl;
+        bool ruleApplied = false;
+        if (!_rules[i]._isApplied) {
+            std::cout << "try to apply rule" << std::endl;
+            ruleApplied = _rules[i].applyRule(_factsStatus);
+        }
+        if(!ruleApplied) {
+            i++;
+        }
+        else {
+            i = 0;
+        }
+    }
+    std::cout << "end of apply rule" << std::endl;
 
-// }
+}
 
 void ExpertSys::applyQueries()
 {

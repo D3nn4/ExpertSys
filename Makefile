@@ -2,6 +2,7 @@ NAME = expertSys.exe
 
 SRC =	main.cpp \
 			./src/lexer.cpp	\
+			./src/rules.cpp	\
 			./src/expertSys.cpp
 
 HEADER =	-I./includes

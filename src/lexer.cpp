@@ -90,17 +90,17 @@ void Lexer::addRules (std::string const & line)
 
     Rule newRule;
     Fact::Type currentType = Fact::Type::AND;
-    std::vector<Fact>* currentVector = &newRule._conditions;
+    std::vector<Fact>* currentVector = newRule.getConditions();
     for (std::string& elem : tokens) {
         Fact newFact;
         newFact._type = currentType;
         currentType = Fact::Type::AND;
         if ('A' <= elem[0] && elem[0] <= 'Z') {
-            newFact._val = elem[0];
+            newFact._data = elem[0];
             currentVector->push_back(newFact);
         }
         else if (elem[0] == '!') {
-            newFact._val = elem[1];
+            newFact._data = elem[1];
             newFact._type = Fact::Type::ANDNOT;
             currentVector->push_back(newFact);
         }
@@ -113,7 +113,7 @@ void Lexer::addRules (std::string const & line)
             currentVector->back()._type = currentType;
         }
         else if (elem[0] == '=') {
-            currentVector = &newRule._result;
+            currentVector = newRule.getResults();
         }
         //TODO XORNOT ORNOT IFANDONLYIF
 
