@@ -16,7 +16,7 @@ int main (int argc, char** argv)
         std::string const file_name = argv[1];
         ExpertSys expSys(file_name);
         expSys.applyQueries();
-        std::cout << "expSys done" << std::endl;
+        // std::cout << "expSys done" << std::endl;
     }
 
     return 0;
