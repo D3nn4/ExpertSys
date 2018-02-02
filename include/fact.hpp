@@ -6,8 +6,8 @@ struct Fact
         OR,
         XOR,
         ANDNOT,
-        // ORNOT,
-        // XORNOT,
+        ORNOT,
+        XORNOT,
     };
     enum class Status {
         TRUE,

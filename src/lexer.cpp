@@ -13,7 +13,6 @@ Lexer::Lexer (std::string const & file_name)
             while (std::getline (myfile,line)) {
                 line = deleteComments(line);
                 if(!line.empty()) {
-                    // std::cout << line << std::endl;
                     if (line[0] == '=') {
                         addFacts(line);
                     }
@@ -63,10 +62,6 @@ void Lexer::addFacts (std::string const & line)
             _facts.push_back(elem);
         }
     }
-    // std::cout << "there is " << _facts.size() << " facts." << std::endl;
-    // for(auto& elem : _facts) {
-    //     std::cout << elem << std::endl;
-    // }
 }
 
 void Lexer::addQueries (std::string const & line)
@@ -77,10 +72,6 @@ void Lexer::addQueries (std::string const & line)
             _queries.push_back(elem);
         }
     }
-    // std::cout << "there is " << _queries.size() << " queries." << std::endl;
-    // for(auto& elem : _queries) {
-    //     std::cout << elem << std::endl;
-    // }
 }
 
 void Lexer::addRules (std::string const & line)
@@ -90,36 +81,44 @@ void Lexer::addRules (std::string const & line)
 
     Rule newRule;
     Fact::Type currentType = Fact::Type::AND;
-    std::vector<Fact>* currentVector = newRule.getConditions();
+    std::vector<Fact> currentVector;
     for (std::string& elem : tokens) {
         Fact newFact;
         newFact._type = currentType;
         currentType = Fact::Type::AND;
         if ('A' <= elem[0] && elem[0] <= 'Z') {
             newFact._data = elem[0];
-            currentVector->push_back(newFact);
+            currentVector.push_back(newFact);
         }
         else if (elem[0] == '!') {
             newFact._data = elem[1];
-            newFact._type = Fact::Type::ANDNOT;
-            currentVector->push_back(newFact);
+            if(newFact._type == Fact::Type::AND){
+                newFact._type = Fact::Type::ANDNOT;
+            }
+            else if(newFact._type == Fact::Type::XOR){
+                newFact._type = Fact::Type::XORNOT;
+            }
+            else if(newFact._type == Fact::Type::OR){
+                newFact._type = Fact::Type::ORNOT;
+            }
+            else {
+                std::cout << "Error : Type not known" << std::endl;
+            }
+            currentVector.push_back(newFact);
         }
         else if (elem[0] == '|') {
             currentType = Fact::Type::OR;
-            currentVector->back()._type = currentType;
+            currentVector.back()._type = currentType;
         }
         else if (elem[0] == '^') {
             currentType = Fact::Type::XOR;
-            currentVector->back()._type = currentType;
+            currentVector.back()._type = currentType;
         }
         else if (elem[0] == '=') {
-            currentVector = newRule.getResults();
+            newRule.addConditions(currentVector);
+            currentVector.clear();
         }
-        //TODO XORNOT ORNOT IFANDONLYIF
-
     }
-    // std::cout << newRule._conditions.size() << std::endl;
-    // std::cout << newRule._result.size() << std::endl;
-    // std::cout << std::endl;
+    newRule.addResults(currentVector);
     _rules.push_back(newRule);
 }
