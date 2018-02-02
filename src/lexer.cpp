@@ -3,6 +3,49 @@
 #include <boost/algorithm/string.hpp>
 #include "../include/lexer.hpp"
 
+bool Lexer::isValidFactOrQuery(std::string const & line)
+{
+    for (size_t i = 1; i < line.size(); i++) {
+        if(line[i] != ' '){
+            if (line[i] < 'A' || 'Z' < line[i]) {
+                if(line[0] == '=')
+                    std::cout << "Error : invalid facts.\n";
+                else
+                    std::cout << "Error : invalid queries.\n";
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+bool Lexer::isValidRules(std::string const & line)
+{
+    bool isFact = true;
+    std::vector<std::string> tokens;
+    boost::split(tokens, line, [](char c){return c == ' ';});
+    for (std::string& elem : tokens) {
+        if (isFact) {
+            if ((elem.size() > 2)
+                ||((elem.size() == 2) && (elem[0] != '!' || (elem[1] < 'A' || 'Z' < elem[1])))
+                ||((elem.size() == 1) && (elem[0] < 'A' || 'Z' < elem[0]))){
+                std::cout << "Error : invalid rules.\n";
+                return false;
+            }
+        }
+        else {
+            if(elem.size() > 2
+               || (elem.size() == 2 && elem.compare("=>") != 0)
+               || (elem.size() == 1 && (elem.find_first_not_of("+|^") != std::string::npos))){
+                std::cout << "Error : invalid rules.\n";
+                return false;
+            }
+        }
+        isFact = !isFact;
+    }
+    return true;
+}
+
 Lexer::Lexer (std::string const & file_name)
     :_file_name (file_name)
 {
@@ -14,13 +57,28 @@ Lexer::Lexer (std::string const & file_name)
                 line = deleteComments(line);
                 if(!line.empty()) {
                     if (line[0] == '=') {
-                        addFacts(line);
+                        if(isValidFactOrQuery(line)){
+                            addFacts(line);
+                        }
+                        else {
+                            return;
+                        }
                     }
                     else if (line[0] == '?') {
-                        addQueries(line);
+                        if(isValidFactOrQuery(line)){
+                            addQueries(line);
+                        }
+                        else {
+                            return;
+                        }
                     }
                     else {
-                        addRules(line);
+                        if(isValidRules(line)){
+                            addRules(line);
+                        }
+                        else {
+                            return;
+                        }
                     }
                 }
             }
@@ -56,7 +114,6 @@ std::string Lexer::deleteComments (std::string line)
 }
 void Lexer::addFacts (std::string const & line)
 {
-    // LATER: check validity
     for (char const & elem: line) {
         if(elem != '=' && elem != ' ') {
             _facts.push_back(elem);
@@ -66,7 +123,6 @@ void Lexer::addFacts (std::string const & line)
 
 void Lexer::addQueries (std::string const & line)
 {
-    // LATER: check validity
     for (char const & elem: line) {
         if(elem != '?' && elem != ' ') {
             _queries.push_back(elem);

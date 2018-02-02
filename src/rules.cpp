@@ -36,7 +36,6 @@ Fact::Status Rule::checkAnd (Fact currFact,std::map<char, Fact::Status> const & 
             return Fact::Status::FALSE;
         }
     }
-    std::cout << "Error in checkAnd" << std::endl;
     return Fact::Status::FALSE;
 }
 
@@ -134,7 +133,6 @@ Fact::Status Rule::checkConditions (std::map<char, Fact::Status> const & facts)
 
 void Rule::applyRule (std::map<char, Fact::Status>& facts)
 {
-
     if (checkConditions(facts) != Fact::Status::TRUE) {
         return;
     }
@@ -146,7 +144,12 @@ void Rule::applyRule (std::map<char, Fact::Status>& facts)
             facts[currFact._data] = Fact::Status::TRUE;
         }
         else if (currFact._type == Fact::Type::ANDNOT) {
-            facts[currFact._data] = Fact::Status::FALSE;
+            if(facts[currFact._data] == Fact::Status::TRUE){
+                facts[currFact._data] = Fact::Status::UNDETERMINED;
+            }
+            else {
+                facts[currFact._data] = Fact::Status::FALSE;
+            }
         }
         if (currFact._type == Fact::Type::OR
             || currFact._type == Fact::Type::ORNOT

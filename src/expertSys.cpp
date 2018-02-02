@@ -36,7 +36,7 @@ void ExpertSys::applyRules()
     }
 }
 
-void printStatus(Fact::Status status)
+static void printStatus(Fact::Status status)
 {
     if(status == Fact::Status::TRUE) {
         std::cout << " true ";
